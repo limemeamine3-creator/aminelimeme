@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | إدارة مشاريع أوتاكو</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
+
+    <!-- الهيدر -->
+    <header class="bg-gray-900 border-b border-gray-800 p-5 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-purple-600 text-white p-2.5 rounded-xl shadow-lg shadow-purple-500/30">
+                    <i class="fa-solid fa-chart-line text-xl"></i>
+                </div>
+                <h1 class="text-xl font-black bg-gradient-to-l from-purple-400 to-indigo-500 bg-clip-text text-transparent">لوحة إدارة المهام</h1>
+            </div>
+            <div class="text-sm text-gray-400">المطور: <span class="text-purple-400 font-bold">أمين الإمام</span></div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-7xl mx-auto px-4 py-10 w-full flex-grow space-y-8">
+        
+        <!-- كروت الإحصائيات الفورية -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                <div>
+                    <p class="text-gray-400 text-sm font-semibold">المهام المنتظرة</p>
+                    <h3 id="todo-count" class="text-3xl font-black text-amber-500 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-clock"></i></div>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                <div>
+                    <p class="text-gray-400 text-sm font-semibold">قيد الإنجاز</p>
+                    <h3 id="progress-count" class="text-3xl font-black text-indigo-400 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-spinner fa-spin-pulse"></i></div>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between shadow-xl">
+                <div>
+                    <p class="text-gray-400 text-sm font-semibold">المهام المكتملة</p>
+                    <h3 id="done-count" class="text-3xl font-black text-green-400 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
+        </div>
+
+        <!-- فوروم إضافة مهمة جديدة -->
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-plus text-purple-500"></i> إضافة مهمة جديدة للمشروع</h2>
+            <form id="task-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="text" id="task-title" placeholder="اسم المهمة (مثال: رفع منتجات الأنمي)" class="bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition md:col-span-2" required>
+                <button type="submit" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-purple-600/20">
+                    إضافة المهمة
+                </button>
+            </form>
+        </div>
+
+        <!-- أعمدة المهام (Kanban Board) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- عمود To Do -->
+            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <span class="font-bold flex items-center gap-2 text-amber-500"><i class="fa-solid fa-list-ul"></i> منتظرة</span>
+                </div>
+                <div id="todo-column" class="space-y-3 min-h-[200px]"></div>
+            </div>
+
+            <!-- عمود In Progress -->
+            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <span class="font-bold flex items-center gap-2 text-indigo-400"><i class="fa-solid fa-bars-progress"></i> قيد العمل</span>
+                </div>
+                <div id="progress-column" class="space-y-3 min-h-[200px]"></div>
+            </div>
+
+            <!-- عمود Done -->
+            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <span class="font-bold flex items-center gap-2 text-green-400"><i class="fa-solid fa-check-double"></i> مكتملة</span>
+                </div>
+                <div id="done-column" class="space-y-3 min-h-[200px]"></div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 border-t border-gray-800 py-6 text-center text-gray-500 text-sm mt-12">
+        <p>لوحة التحكم الذكية © 2026 | مبرمجة بالـ Vanilla JS</p>
+    </footer>
+
+    <!-- سكريبت إدارة لوحة التحكم فوريّاً -->
+    <script>
+        // مصفوفة المهام الإفتراضية لبدء العمل
+        let tasks = [
+            { id: 1, title: "تعديل أسعار مجسمات زورو في الموقع", status: "todo" },
+            { id: 2, title: "برمجة نظام الترجمة الفوري للسلة", status: "progress" },
+            { id: 3, title: "تجهيز صور تيشيرتات لوفي قير 5", status: "done" }
+        ];
+
+        const form = document.getElementById('task-form');
+        const titleInput = document.getElementById('task-title');
+
+        // دالة تحديث وعرض اللوحة
+        function updateDashboard() {
+            const todoCol = document.getElementById('todo-column');
+            const progressCol = document.getElementById('progress-column');
+            const doneCol = document.getElementById('done-column');
+
+            // تفريغ الأعمدة قبل التحديث
+            todoCol.innerHTML = '';
+            progressCol.innerHTML = '';
+            doneCol.innerHTML = '';
+
+            let todoCount = 0, progressCount = 0, doneCount = 0;
+
+            tasks.forEach(task => {
+                const taskHTML = `
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-md space-y-3 hover:border-gray-700 transition">
+                        <p class="text-sm font-semibold text-white leading-relaxed">${task.title}</p>
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-800/50 text-xs">
+                            <button onclick="deleteTask(${task.id})" class="text-red-400 hover:text-red-300 transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash-can"></i> حذف
+                            </button>
+                            <div class="flex gap-1">
+                                ${task.status !== 'todo' ? `<button onclick="changeStatus(${task.id}, 'todo')" class="bg-amber-500/10 text-amber-500 px-2 py-1 rounded hover:bg-amber-500 hover:text-white transition">منتظرة</button>` : ''}
+                                ${task.status !== 'progress' ? `<button onclick="changeStatus(${task.id}, 'progress')" class="bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded hover:bg-indigo-500 hover:text-white transition">قيد العمل</button>` : ''}
+                                ${task.status !== 'done' ? `<button onclick="changeStatus(${task.id}, 'done')" class="bg-green-500/10 text-green-400 px-2 py-1 rounded hover:bg-green-500 hover:text-white transition">مكتملة</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (task.status === 'todo') { todoCol.innerHTML += taskHTML; todoCount++; }
+                else if (task.status === 'progress') { progressCol.innerHTML += taskHTML; progressCount++; }
+                else if (task.status === 'done') { doneCol.innerHTML += taskHTML; doneCount++; }
+            });
+
+            // تحديث كروت الإحصائيات الفوقية
+            document.getElementById('todo-count').innerText = todoCount;
+            document.getElementById('progress-count').innerText = progressCount;
+            document.getElementById('done-count').innerText = doneCount;
+        }
+
+        // إضافة مهمة جديدة
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newValidTask = {
+                id: Date.now(),
+                title: titleInput.value,
+                status: 'todo'
+            };
+            tasks.push(newValidTask);
+            titleInput.value = '';
+            updateDashboard();
+        });
+
+        // تغيير حالة المهمة
+        function changeStatus(id, newStatus) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.status = newStatus;
+                updateDashboard();
+            }
+        }
+
+        // حذف المهمة
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            updateDashboard();
+        }
+
+        // تشغيل اللوحة لأول مرة
+        updateDashboard();
+    </script>
+</body>
+</html>
